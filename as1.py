@@ -46,7 +46,7 @@ def BoyerMoore(text: str, pat: str):
     r = r_values(pat)
     suffix_pos, z, gs, mp = good_suffix(pat)
     m = len(pat)
-    start, stop = 0,0
+    start, stop = 0,-1
     comparisons = 0
     
             
@@ -73,24 +73,38 @@ def BoyerMoore(text: str, pat: str):
         bc_shift = mismatch - r[mismatch][ord(text[current + mismatch]) - ord('!')]
         
         gs_shift = 0
-        if mismatch >= 0: 
+        if mismatch == m-1:
+            pass
+        elif mismatch >= 0: 
             if gs[m-2][mismatch + 1] > 0:
                 edge = m - 2
                 while edge > 0:
                     if pat[gs[edge][mismatch + 1] - m + mismatch + 1] == text[current + mismatch]:
                         gs_shift = m - gs[edge][mismatch + 1] - 1
+                        start = gs[edge][mismatch + 1] - m + mismatch
+                        stop = gs[edge][mismatch + 1]
                         break
                     else:
                         edge = edge - m + mismatch + 1
                 else:
                     gs_shift = m - mp[mismatch + 1]
+                    start = 0
+                    stop = mp[mismatch + 1]
             else:
                 gs_shift = m - mp[mismatch + 1]
+                start = 0
+                stop = mp[mismatch + 1]
         else:  
-            gs_shift = m - mp[1] 
-        
-        shift = max(gs_shift, bc_shift)
-
+            gs_shift = m - mp[1]
+            start = 0
+            stop = mp[1]
+            
+            
+        if gs_shift >= bc_shift:
+            shift = gs_shift
+        else: 
+            shift = start = stop = bc_shift
+            
         current += shift
         n += 1
     print(n, "shifts")
@@ -101,4 +115,4 @@ def BoyerMoore(text: str, pat: str):
 
 
 
-print(BoyerMoore("x--xz--xz--xz--xz--y--", "x--xz--xz--xz--xz--y--"))
+print(BoyerMoore("babaabcaaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababcvabvabasbabaabcacvabvabab", "babaabcacvabvabab"))

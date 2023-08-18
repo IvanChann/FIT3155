@@ -104,5 +104,4 @@ def BoyerMoore(text: str, pat: str):
     
 
 
-
-print(BoyerMoore("x--xz--xz--xz--xz--x--x--xz--xz--xz--xz--y--", "x--xz--xz--xz--xz--y--"))
+print(BoyerMoore("babaabcaaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababcvabvabasbabaabcacvabvabab", "babaabcacvabvabab"))
