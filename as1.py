@@ -24,18 +24,19 @@ def good_suffix(pat: str):
     #     else:
     #         suffix_pos[z[i]] += [i]
 
+    gsi = []
     gs = [0 for _ in range(m+1)]  
-    for i in range(m-1):
+    for i in range(m - 1):
         j = m - z[i] 
         gs[j] = i
+        gsi.append(gs.copy())
     
     mp = [0 for _ in range(m+1)]
     mp[0] = m
     
     for i in range(1, m):
         mp[i] = max(z[:m - i])
-        
-    return suffix_pos , z, gs, mp
+    return suffix_pos , z, gsi, mp
 
 
 def BoyerMoore(text: str, pat: str):
@@ -58,8 +59,8 @@ def BoyerMoore(text: str, pat: str):
     shift = 0
     current = 0
     while current + m <= len(text):
-        # print(text)
-        # print(" " * current + pat)
+        print(text)
+        print(" " * current + pat)
         mismatch = -1
         for i in [_ for _ in range(m-1, stop, -1)] + [_ for _ in range(start - 1, -1, -1)]:
             comparisons += 1
@@ -71,16 +72,24 @@ def BoyerMoore(text: str, pat: str):
         
         bc_shift = mismatch - r[mismatch][ord(text[current + mismatch]) - ord('!')]
         
-        mp_shift = 0
-        if mismatch >= 0:   
-            if gs[mismatch + 1] > 0: 
-                mp_shift = m - gs[mismatch + 1] - 1
+        gs_shift = 0
+        if mismatch >= 0: 
+            if gs[m-2][mismatch + 1] > 0:
+                edge = m - 2
+                while edge > 0:
+                    if pat[gs[edge][mismatch + 1] - m + mismatch + 1] == text[current + mismatch]:
+                        gs_shift = m - gs[edge][mismatch + 1] - 1
+                        break
+                    else:
+                        edge = edge - m + mismatch + 1
+                else:
+                    gs_shift = m - mp[mismatch + 1]
             else:
-                mp_shift = m - mp[mismatch + 1]
-        else: 
-            mp_shift = m - mp[1] 
+                gs_shift = m - mp[mismatch + 1]
+        else:  
+            gs_shift = m - mp[1] 
         
-        shift = max(mp_shift, bc_shift)
+        shift = max(gs_shift, bc_shift)
 
         current += shift
         n += 1
@@ -92,4 +101,4 @@ def BoyerMoore(text: str, pat: str):
 
 
 
-print(BoyerMoore("aabaaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkaskfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasbabaaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaassnaasdasda","aabababaa"))
+print(BoyerMoore("x--xz--xz--xz--xz--y--", "x--xz--xz--xz--xz--y--"))

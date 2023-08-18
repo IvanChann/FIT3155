@@ -58,8 +58,8 @@ def BoyerMoore(text: str, pat: str):
     shift = 0
     current = 0
     while current + m <= len(text):
-        # print(text)
-        # print(" " * current + pat)
+        print(text)
+        print(" " * current + pat)
         mismatch = -1
         # for i in range(m - 1, -1, -1):
         ran = [_ for _ in range(m-1, stop, -1)] + [_ for _ in range(start - 1, -1, -1)]
@@ -105,4 +105,4 @@ def BoyerMoore(text: str, pat: str):
 
 
 
-print(BoyerMoore("aabaaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasbabaaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaasaaasnasjfnsdlfnsdlnaabababaaadaaaaaaabababaaaabababaaaabababaaaabababaadlfkasflkalkfdsnflkdsnaassnaasdasda","aabababaa"))
+print(BoyerMoore("x--xz--xz--xz--xz--x--x--xz--xz--xz--xz--y--", "x--xz--xz--xz--xz--y--"))
