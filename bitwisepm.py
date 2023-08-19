@@ -1,18 +1,20 @@
 from bitarray import bitarray
 import sys
 
+"Performs bitwise pattern matching to find occurrences of pattern in text."
 def bitwisepm(text: str, pat: str):
+    
     m = len(pat)
-    bitv = bitarray("1" * m)
-    delta = bitarray("0"  * m)
+    bitv = bitarray("1" * m) # initialize bitvector 
+    delta = bitarray("0"  * m) # initialize delta
     
     result = []
     
     for j in range(len(text)):
         for i in range(m - 1, -1, -1):
-            delta[m - i - 1] = 1 if text[j] != pat[i] else 0
-        bitv = (bitv << 1) | delta
-        if not bitv[0]:
+            delta[m - i - 1] = 1 if text[j] != pat[i] else 0 # calculating delta values in place
+        bitv = (bitv << 1) | delta # calculate next bitv
+        if not bitv[0]: # if pattern found
             result.append(j - m + 1)
     return result
 
