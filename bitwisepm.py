@@ -1,4 +1,5 @@
 from bitarray import bitarray
+import sys
 
 def bitwisepm(text: str, pat: str):
     m = len(pat)
@@ -15,4 +16,19 @@ def bitwisepm(text: str, pat: str):
             result.append(j - m + 1)
     return result
 
-print(bitwisepm("xaadadadaxdad" , "dadax"))
+if __name__ == "__main__":
+    text_filename = sys.argv[1]
+    pattern_filename = sys.argv[2]
+    
+    with open(text_filename, "r") as text_file:
+        text = text_file.read().strip()
+
+    with open(pattern_filename, "r") as pattern_file:
+        pat = pattern_file.read().strip()
+
+    results = bitwisepm(text, pat)
+    
+    out_string = "\n".join(str(result + 1) for result in results)
+
+    with open("output_bitwisepm.txt", "w") as output:
+        output.write(out_string)
