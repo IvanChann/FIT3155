@@ -58,8 +58,8 @@ def BoyerMoore(text: str, pat: str):
     shift = 0
     current = 0
     while current + m <= len(text):
-        print(text)
-        print(" " * current + pat)
+        # print(text)
+        # print(" " * current + pat)
         mismatch = -1
         # for i in range(m - 1, -1, -1):
         ran = [_ for _ in range(m-1, stop, -1)] + [_ for _ in range(start - 1, -1, -1)]
@@ -99,9 +99,7 @@ def BoyerMoore(text: str, pat: str):
         n += 1
     print(n, "shifts")
     print(comparisons, "comparisons")
-    
+    print(len(results), "results")
     return results
     
 
-
-print(BoyerMoore("babaabcaaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababaabcacvabvabasbabaabcacvabvababcvabvabasbabaabcacvabvabab", "babaabcacvabvabab"))
