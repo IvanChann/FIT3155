@@ -16,13 +16,6 @@ def good_suffix(pat: str):
     z = zalgo(pat[::-1])
     z.reverse()
     z[-1] = 0
-    
-    suffix_pos = {}
-    # for i in range(len(z)):
-    #     if z[i] not in suffix_pos.keys():
-    #         suffix_pos[z[i]] = [i]
-    #     else:
-    #         suffix_pos[z[i]] += [i]
 
     gsi = []
     gs = [0 for _ in range(m+1)]  
@@ -36,7 +29,7 @@ def good_suffix(pat: str):
     
     for i in range(1, m):
         mp[i] = max(z[:m - i])
-    return suffix_pos , z, gsi, mp
+    return z, gsi, mp
 
 
 def BoyerMoore(text: str, pat: str):
@@ -44,9 +37,9 @@ def BoyerMoore(text: str, pat: str):
     text = text
     pat = pat
     r = r_values(pat)
-    suffix_pos, z, gs, mp = good_suffix(pat)
+    z, gs, mp = good_suffix(pat)
     m = len(pat)
-    start, stop = 0,-1
+    start, stop = 0, 0
     comparisons = 0
     
             
@@ -62,8 +55,9 @@ def BoyerMoore(text: str, pat: str):
         # print(text)
         # print(" " * current + pat)
         mismatch = -1
-        for i in [_ for _ in range(m-1, stop - 1, - 1)] + [_ for _ in range(start - 1, -1, -1)]:
+        for i in [_ for _ in range(m-1, stop - 1, - 1)] + [_ for _ in range(start, -1, -1)]:
             comparisons += 1
+                  
             if pat[i] != text[current + i]:
                 mismatch = i 
                 break
@@ -75,6 +69,7 @@ def BoyerMoore(text: str, pat: str):
         gs_shift = 0
         if mismatch == m-1:
             pass
+        
         elif mismatch >= 0: 
             if gs[m-2][mismatch + 1] > 0:
                 edge = m - 2
@@ -102,7 +97,9 @@ def BoyerMoore(text: str, pat: str):
         if gs_shift >= bc_shift:
             shift = gs_shift
         else: 
-            shift = start = stop = bc_shift
+            shift = stop = bc_shift
+            start = stop - 1
+            
             
         current += shift
         n += 1
@@ -111,18 +108,20 @@ def BoyerMoore(text: str, pat: str):
     # print(len(results), "results")
     return results
     
-if __name__ == "__main__":
-    text_filename = sys.argv[1]
-    pattern_filename = sys.argv[2]
+# if __name__ == "__main__":
+#     text_filename = sys.argv[1]
+#     pattern_filename = sys.argv[2]
     
-    with open(text_filename, "r") as text_file:
-        text = text_file.read().strip()
+#     with open(text_filename, "r") as text_file:
+#         text = text_file.read().strip()
 
-    with open(pattern_filename, "r") as pattern_file:
-        pat = pattern_file.read().strip()
+#     with open(pattern_filename, "r") as pattern_file:
+#         pat = pattern_file.read().strip()
 
-    results = BoyerMoore(text, pat)
-    out_string = "\n".join(str(result + 1) for result in results)
+#     results = BoyerMoore(text, pat)
+#     out_string = "\n".join(str(result + 1) for result in results)
     
-    with open("output_stricterBM.txt", "w") as output:
-        output.write(out_string)
+#     with open("output_stricterBM.txt", "w") as output:
+#         output.write(out_string)
+        
+# print(BoyerMoore("aaacacabaaacaacabaaaaaacababaa", "acabaaaaaacaba"))
