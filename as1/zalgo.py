@@ -60,7 +60,6 @@ def zalgo(string: str) -> list[int]:
                 
 
     return zvalues
-    print(zvalues, lr)    
                 
 
 def pat_match(txt : str, pat : str):
