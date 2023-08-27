@@ -1,8 +1,8 @@
 import random
 import regex as re
-from stricterBM import BoyerMoore as BM
+from stricterBM import BoyerMoore
 from bitwisepm import bitwisepm
-from boyeeemore import BoyerMoore 
+
 
 import random
 import string
@@ -35,15 +35,36 @@ def test_pattern_matching(pattern, text_length=100, num_trials=1000):
 
     for _ in range(num_trials):
         random_text = generate_test_text(pattern, text_length, random.randint(0,text_length//2))
+        blockPrint()
         regex, bm, bw = pattern_matches(pattern, random_text)
+        enablePrint()
         if len(regex) != len(bm):
             print("bm error", len(regex), len(bm))
             print(random_text)
+            return True
         if len(regex) != len(bw):
             print("bw error", len(regex), len(bw))
             print(random_text)
+            return True
+    return False
             
-    
+import sys, os
+
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+
 # Example usage:
-pattern = "acabacba"
-test_pattern_matching(pattern, 200, 10000)
+error = False
+tests = 0 
+while not error:
+    tests += 1
+    pattern = generate_random_text(5)
+    print(pattern)
+    error = test_pattern_matching(pattern, 50, 10)
+print("tests:", tests)

@@ -1,7 +1,7 @@
 from bitarray import bitarray
 import sys
 
-"Performs bitwise pattern matching to find occurrences of pattern in text."
+# function for bitwise pattern matching
 def bitwisepm(text: str, pat: str):
     
     m = len(pat)
