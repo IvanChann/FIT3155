@@ -73,13 +73,16 @@ def implicit_stree(string: str):
             print(string[j:i+1], string[i+1])
             print("active:", string[active_node.start:active_node.end+1])
             
+            
             # path_node, path_end = find_path(root, string[j : i + 1], string)
             if active_node != pending_link:
+                print(active_node.suffix_link.children)
                 active_node = active_node.suffix_link
+                
                 
             else: 
                 active_node = root
-            
+
             if active_node is root:
                 path_node, path_end = find_path(root, string[j : i + 1], string)
             else:
@@ -87,6 +90,7 @@ def implicit_stree(string: str):
                 print(string[j:i+1], string[i+1])
                 print(string[i - remainder + 1: i + 1])
                 print("active:", string[active_node.start:active_node.end+1])
+                
 
                 path_node, path_end = find_path(active_node, string[i - remainder + 1: i + 1],  string)
             
@@ -95,13 +99,6 @@ def implicit_stree(string: str):
             if path_node.end == path_end and path_node.is_leaf():
                 path_node.end += 1 
                 
-                # # add suffix link
-                # if pending_link != None:
-                #     pending_link.suffix_link = path_node
-                #     pending_link = None
-                
-                active_node = path_node.parent
-                remainder = path_node.end - path_node.start
                 print("c1")
                 
             # rule 2 extensions (case 1)
@@ -113,7 +110,7 @@ def implicit_stree(string: str):
                     pending_link = None
                     
                 active_node = path_node
-                remainder = path_end - path_node.start
+                remainder = 0
                 
                 
                 new_child = Node(i+1, i+1, path_node, j)
@@ -139,13 +136,11 @@ def implicit_stree(string: str):
                 
             # rule 3
             elif (path_node.end == path_end and string[i+1] in path_node.children) or (path_end < path_node.end and string[i+1] == string[path_end + 1]):
-                if pending_link != None:
-                    pending_link.suffix_link = path_node.parent
-                    pending_link = None
-                
-                active_node = path_node.parent
-                remainder = path_end - path_node.start
                 print("c3")
+                if pending_link != None:
+                    pending_link.suffix_link = active_node
+                    pending_link = None
+             
 
             print("-----------------------------")
                 
@@ -215,7 +210,7 @@ def generate_random_text(length=1000):
     """Generate a random string of lowercase alphabets of given length."""
     return ''.join(random.choice(stringg.ascii_lowercase[:3]) for _ in range(length))
 
-string = "xdxdddxasaddxdd"
+string = generate_random_text(10)
 root = implicit_stree(string)
 
 print_tree(root, string)
