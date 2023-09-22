@@ -1,86 +1,74 @@
-from zalgo import zalgo
+def compute_z_values(string):
+    n = len(string)
+    z = [0] * n
+    z[0] = n
+    l, r = 0, 0
 
+    for i in range(1, n):
+        if i <= r:
+            z[i] = min(r - i + 1, z[i - l])
+        
+        while i + z[i] < n and string[z[i]] == string[i + z[i]]:
+            z[i] += 1
 
-# generate right most occurreneces
-def r_values(pat: str) -> list:
+        if i + z[i] - 1 > r:
+            l, r = i, i + z[i] - 1
+
+    return z
+
+def compute_r_values(pat):
     m = len(pat)
-    r = [-1 for _ in range(ord('!'), ord('~') + 1)]
-    result = []
+    r = {ch: -1 for ch in set(pat)}
+
     for i in range(m):
-        r[ord(pat[i]) - ord('!')] = i
-        result.append(r.copy())
-    return result
+        r[pat[i]] = i
 
-def good_suffix(pat: str):
+    return r
+
+def compute_good_suffix(pat):
     m = len(pat)
-    z = zalgo(pat[::-1])
+    rev_pat = pat[::-1]
+    z = compute_z_values(rev_pat)
     z.reverse()
-    z[-1] = 0
-    
-    gs = [0 for _ in range(m+1)]  
-    for i in range(m-1):
-        j = m - z[i] 
-        gs[j] = i
-    
-    mp = [0 for _ in range(m+1)]
+
+    gs = [0] * (m + 1)
+    mp = [0] * (m + 1)
     mp[0] = m
     
     for i in range(1, m):
         mp[i] = max(z[:m - i])
-        
-    return z, gs, mp
+        j = m - z[i]
+        gs[j] = i
+    
+    return gs, mp
 
-
-def BoyerMoore(text: str, pat: str):
-    n = 0
-    text = text
-    pat = pat
-    r = r_values(pat)
-    z, gs, mp = good_suffix(pat)
+def BoyerMoore(text, pat):
     m = len(pat)
-
-    comparisons = 0
-            
-    # print("z: ", z)
-    # print("gs: ", gs)
-    # print("mp: ", mp)
+    n = len(text)
+    r = compute_r_values(pat)
+    gs, mp = compute_good_suffix(pat)
     results = []
 
-    shift = 0
     current = 0
-    while current + m <= len(text):
-        # print(text)
-        # print(" " * current + pat)
+    while current + m <= n:
         mismatch = -1
         for i in range(m - 1, -1, -1):
-            comparisons += 1
             if pat[i] != text[current + i]:
-                mismatch = i 
+                mismatch = i
                 break
-            
-        else:  # if loop doesnt break
+        else:
             results.append(current)
         
-        bc_shift = mismatch - r[mismatch][ord(text[current + mismatch]) - ord('!')]
+        bc_shift = mismatch - r.get(text[current + mismatch], -1)
         
-        mp_shift = 0
         if mismatch >= 0:   
-            if gs[mismatch + 1] > 0: 
-                mp_shift = m - gs[mismatch + 1] - 1
-            else:
-                mp_shift = m - mp[mismatch + 1] 
-        else: 
-            mp_shift = m - mp[1] 
+            mp_shift = m - gs[mismatch + 1] - 1 if gs[mismatch + 1] > 0 else m - mp[mismatch + 1] - 1
+        else:
+            mp_shift = m - mp[1]
         
-        
-        if mp_shift >= bc_shift:
-            shift = mp_shift
-        else: 
-            shift =  bc_shift
-
+        shift = max(bc_shift, mp_shift)
         current += shift
   
-        n += 1
     return results
-    
 
+# print(BoyerMoore("nwmpnphvphtkaphdaafphpevfphpaephigxgphllnphphvfvfp", "p"))

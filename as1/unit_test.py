@@ -1,6 +1,7 @@
 import random
 import regex as re
-from stricterBM import BoyerMoore
+# from stricterBM import BoyerMoore
+from boyeeemore import BoyerMoore
 from bitwisepm import bitwisepm
 
 
@@ -58,13 +59,23 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
+def generateTest(pat_length, text_length):
+    pattern = generate_random_text(pat_length)
+    text = generate_test_text(pattern, text_length, random.randint(0,text_length//2))
+    return pattern, text
 
-# Example usage:
-error = False
-tests = 0 
-while not error:
-    tests += 1
-    pattern = generate_random_text(5)
-    print(pattern)
-    error = test_pattern_matching(pattern, 50, 10)
-print("tests:", tests)
+# # Example usage:
+# error = False
+# tests = 0 
+# while not error:
+#     tests += 1
+#     pattern = generate_random_text(10)
+#     print(pattern)
+#     error = test_pattern_matching(pattern, 50, 10)
+# print("tests:", tests)
+
+pattern, text = generateTest(2, 2000000)
+with open("testtext.txt", "w") as output:
+    output.write(text)
+    
+print(pattern)
