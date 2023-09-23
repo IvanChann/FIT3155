@@ -1,6 +1,33 @@
 import random
 import string as stringg
 
+# class to simulate pointing to an integer
+class Pointer:
+    def __init__(self, integer = None):
+        self.integer = integer
+        
+    def __eq__(self, other):
+        return self.integer == other
+    
+    def __str__(self):
+        return "global: " + str(self.integer)
+    
+    def __add__(self, other):
+        return self.integer + other
+    
+    def __iadd__(self, other):
+        self.integer += other
+        return self
+
+    def __sub__(self, other):
+        return self.integer - other
+    
+    def __lt__(self, other):
+        return self.integer < other
+    
+    def __gt__(self, other):
+        return self.integer > other
+
 class Node:
     def __init__(self, start=None, end=None, parent=None, suffix_index=None):
         # The range [start, end] (inclusive) specifies the substring of the text 
@@ -45,7 +72,6 @@ class Node:
         self.parent = split_node
         
         
-        
         return split_node
 
     def add_child(self, char, node):
@@ -54,97 +80,79 @@ class Node:
         node.parent = self
     
     
-def implicit_stree(string: str):
+def ukkonens(string: str):
     n = len(string)
+    last_j = 0
+    global_end = Pointer(0)
+    
     root = Node(-1, -1)
-    root.children[string[0]] = Node(0, 0, root, 0)
+    root.children[string[0]] = Node(0, global_end, root, 0)
     root.suffix_link = root
     root.parent = root
     
     active_node = root
     pending_link = None 
-    remainder = None
+    remainder = 0
     
-    last_j = 0
-    global_end = [0]
+
     
     for i in range(n-1):
-        global_end[0] += 1
-
-        for j in range(i+2):
-            # print(f"i: {i}, j:{j}")
-            # print(root.children)
+        global_end += 1
+        active_node = root
+        for j in range(last_j + 1, i+2):
+            active_node = active_node.suffix_link
             
-            # print_tree(root, string)
-            # print(string[j:i+1], string[i+1])
-            # print("active:", string[active_node.start:active_node.end+1])
-            
-            
-            # path_node, path_end = find_path(root, string[j : i + 1], string)
-
             if active_node is root:
                 path_node, path_end = find_path(root, string[j : i + 1])
             else:
-                print("FUCKING LINKED")
-                # print(string[j:i+1], string[i+1])
-                # print(string[i - remainder: i + 1])
-                # print("active:", string[active_node.start:active_node.end+1])
                 
-
                 path_node, path_end = find_path(active_node, string[i - remainder: i + 1])
-            
-                
-            # rule 1 extensions 
-            if path_node.is_leaf() and path_node.end == path_end:
-                path_node.end += 1 
-                
-                remainder = path_end - path_node.start
-                active_node = path_node.parent
-           
-                
+                           
             # rule 2 extensions (case 1)
-            elif path_node.end == path_end and string[i+1] not in path_node.children: 
+            if path_node.end == path_end and string[i+1] not in path_node.children: 
+                
+                active_node = path_node.parent
+                remainder = path_end - path_node.start
                   
                 # add suffix link if pending
                 if pending_link != None:
                     pending_link.suffix_link = path_node
                     pending_link = None         
+                                 
                 
-                new_child = Node(i+1, i+1, path_node, j)
+                new_child = Node(i+1, global_end, path_node, j)
                 path_node.add_child(string[i+1], new_child)
-
+                last_j += 1
             
             # rule 2 extensions (case 2)  
             elif path_end < path_node.end and string[i+1] != string[path_end + 1]:
                 split_node = path_node.split(path_end, string)
-                new_child = Node(i+1, i+1, split_node, j) 
+                new_child = Node(i+1, global_end, split_node, j) 
                 
                 # add suffix link
                 if pending_link != None:
                     pending_link.suffix_link = split_node
-                active_node = split_node
-                remainder = path_end - split_node.start
+                    
+                active_node = split_node.parent
+                remainder = path_end - split_node.start 
+                
                 # case 2 will always create a new internal node
                 pending_link = split_node   
                 split_node.add_child(string[i+1], new_child)
+                last_j += 1
+
+
+
                 
             # rule 3
             elif (path_node.end == path_end and string[i+1] in path_node.children) or (string[i+1] == string[path_end + 1]):
                 if pending_link != None:
-                    pending_link.suffix_link = path_node if path_node.end == path_end else path_node.parent
+                    pending_link.suffix_link = path_node
                     pending_link = None
-                         
-                active_node = root
+                
+                remainder += 1
                 break
             
-                
-            if pending_link != active_node:
-                active_node = active_node.suffix_link
-            else:
-                active_node = root
-
-            
-            print("-----------------------------")
                 
     return root
 
@@ -183,7 +191,6 @@ def print_tree(node, string, depth=0):
     
     # Print indentation
     print('|-' * depth, end='')
-    # print(depth, end='')
 
     # Print the substring for the current node's edge
     if node.start == - 1:
@@ -206,11 +213,12 @@ def generate_random_text(length=1000):
     """Generate a random string of lowercase alphabets of given length."""
     return ''.join(random.choice(stringg.ascii_lowercase[:3]) for _ in range(length))
 
-
+def gen_bwt(str):
+    res = ""
+    suffix_tree = ukkonens(str + "$")
     
-
-string = generate_random_text(20)
-print(string)
-root = implicit_stree(string)
-print_tree(root, string)      
-
+    indexes = suffix_tree.dfs_traversal()
+    str = str + '$'
+    for index in indexes:
+        res += str[index - 1]
+    return res
