@@ -60,46 +60,47 @@ def implicit_stree(string: str):
     root.children[string[0]] = Node(0, 0, root, 0)
     root.suffix_link = root
     root.parent = root
+    
     active_node = root
     pending_link = None 
-    remainder = 0
+    remainder = None
+    
+    last_j = 0
+    global_end = [0]
     
     for i in range(n-1):
+        global_end[0] += 1
+
         for j in range(i+2):
             # print(f"i: {i}, j:{j}")
             # print(root.children)
             
-            print_tree(root, string)
-            print(string[j:i+1], string[i+1])
-            print("active:", string[active_node.start:active_node.end+1])
+            # print_tree(root, string)
+            # print(string[j:i+1], string[i+1])
+            # print("active:", string[active_node.start:active_node.end+1])
             
             
             # path_node, path_end = find_path(root, string[j : i + 1], string)
-            if active_node != pending_link:
-                print(active_node.suffix_link.children)
-                active_node = active_node.suffix_link
-                
-                
-            else: 
-                active_node = root
 
             if active_node is root:
-                path_node, path_end = find_path(root, string[j : i + 1], string)
+                path_node, path_end = find_path(root, string[j : i + 1])
             else:
                 print("FUCKING LINKED")
-                print(string[j:i+1], string[i+1])
-                print(string[i - remainder + 1: i + 1])
-                print("active:", string[active_node.start:active_node.end+1])
+                # print(string[j:i+1], string[i+1])
+                # print(string[i - remainder: i + 1])
+                # print("active:", string[active_node.start:active_node.end+1])
                 
 
-                path_node, path_end = find_path(active_node, string[i - remainder + 1: i + 1],  string)
+                path_node, path_end = find_path(active_node, string[i - remainder: i + 1])
             
                 
             # rule 1 extensions 
-            if path_node.end == path_end and path_node.is_leaf():
+            if path_node.is_leaf() and path_node.end == path_end:
                 path_node.end += 1 
                 
-                print("c1")
+                remainder = path_end - path_node.start
+                active_node = path_node.parent
+           
                 
             # rule 2 extensions (case 1)
             elif path_node.end == path_end and string[i+1] not in path_node.children: 
@@ -107,69 +108,64 @@ def implicit_stree(string: str):
                 # add suffix link if pending
                 if pending_link != None:
                     pending_link.suffix_link = path_node
-                    pending_link = None
-                    
-                active_node = path_node
-                remainder = 0
-                
+                    pending_link = None         
                 
                 new_child = Node(i+1, i+1, path_node, j)
                 path_node.add_child(string[i+1], new_child)
-                print("c21")
+
             
             # rule 2 extensions (case 2)  
             elif path_end < path_node.end and string[i+1] != string[path_end + 1]:
                 split_node = path_node.split(path_end, string)
-                new_child = Node(i+1, i+1, split_node, j)
+                new_child = Node(i+1, i+1, split_node, j) 
                 
                 # add suffix link
                 if pending_link != None:
                     pending_link.suffix_link = split_node
-                
-                # case 2 will always create a new internal node
                 active_node = split_node
-                remainder = path_end - path_node.start
-                pending_link = split_node
+                remainder = path_end - split_node.start
+                # case 2 will always create a new internal node
+                pending_link = split_node   
                 split_node.add_child(string[i+1], new_child)
-                print("c22")
-                
                 
             # rule 3
-            elif (path_node.end == path_end and string[i+1] in path_node.children) or (path_end < path_node.end and string[i+1] == string[path_end + 1]):
-                print("c3")
+            elif (path_node.end == path_end and string[i+1] in path_node.children) or (string[i+1] == string[path_end + 1]):
                 if pending_link != None:
-                    pending_link.suffix_link = active_node
+                    pending_link.suffix_link = path_node if path_node.end == path_end else path_node.parent
                     pending_link = None
-             
+                         
+                active_node = root
+                break
+            
+                
+            if pending_link != active_node:
+                active_node = active_node.suffix_link
+            else:
+                active_node = root
 
+            
             print("-----------------------------")
                 
     return root
 
+# find the path with skip/count
+def find_path(root, substring):
+    child = root
+    i = 0
+    remainder = len(substring) 
 
-def find_path(root, substring, string):
-    current = root
-    i, j = 0, 0
-    child = None
-    
-    if substring == "":
-        return root, j-1
-    
-    while i < len(substring):
-        # If the current character isn't a starting character of any child edge, the path isn't in the tree.
-        if substring[i] not in current.children:
-            return None
-        child = current.children[substring[i]]
-        j = child.start 
-        while i < len(substring) and j <= child.end:
-            if substring[i] != string[j]:
-                return None
-            i += 1
-            j += 1
-        if j <= child.end and i == len(substring):
-            return child, j-1
-        current = child
-    return child, j-1
+    while remainder > 0 :
+        child = child.children[substring[i]]
+
+        if remainder < child.edge_length():
+            return child, child.start + remainder - 1
+        elif remainder == child.edge_length():
+            return child, child.end
+        elif remainder > child.edge_length():
+            remainder = remainder - child.edge_length() 
+            i += child.edge_length() 
+
+    return child, child.end
 
 
 def print_tree(node, string, depth=0):
@@ -210,7 +206,11 @@ def generate_random_text(length=1000):
     """Generate a random string of lowercase alphabets of given length."""
     return ''.join(random.choice(stringg.ascii_lowercase[:3]) for _ in range(length))
 
-string = generate_random_text(10)
-root = implicit_stree(string)
 
-print_tree(root, string)
+    
+
+string = generate_random_text(20)
+print(string)
+root = implicit_stree(string)
+print_tree(root, string)      
+
