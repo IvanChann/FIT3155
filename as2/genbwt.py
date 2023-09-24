@@ -1,7 +1,6 @@
-import random
-import string as stringg
+import sys
 
-# class to emulate pointing to an integer
+# class to emulate a pointer pointing to an integer
 class Pointer:
     def __init__(self, integer = None):
         self.integer = integer
@@ -36,8 +35,7 @@ class Node:
         self.end = end
         self.parent = parent
 
-        # Dictionary that maps characters to the child node.
-        # This will help in navigating the tree based on character.
+        # Dictionary that maps characters to the child.
         self.children = {}
 
         # Link to the suffix node.
@@ -55,7 +53,6 @@ class Node:
         return len(self.children) == 0
 
     def split(self, position, string):
-        """Splits the node at the given position along its edge, creating a new internal node."""
         # Create a new node starting from the original start and ending at the split position.
         
         split_node = Node(self.start, position, self.parent)
@@ -75,7 +72,7 @@ class Node:
         return split_node
 
     def add_child(self, char, node):
-        """Adds a child node with the given character as the starting character of the edge."""
+        # Adds a child node with the given character as the starting character of the edge
         self.children[char] = node
         node.parent = self
     
@@ -153,9 +150,10 @@ def ukkonens(string: str):
                     remainder = 0                         
                 break
             
-            active_node = active_node.suffix_link
+            active_node = active_node.suffix_link # linking after rule 2s
                 
     return root
+
 
 # find the path with skip/count
 def find_path(root, substring):
@@ -165,11 +163,15 @@ def find_path(root, substring):
 
     while remainder > 0 :
         child = child.children[substring[i]]
-
+        # if end somewhere in the middle of the edge
         if remainder < child.edge_length():
             return child, child.start + remainder - 1
+        
+        # if end is at the end of the edge
         elif remainder == child.edge_length():
             return child, child.end
+        
+        # if end is not in edge 
         elif remainder > child.edge_length():
             remainder = remainder - child.edge_length() 
             i += child.edge_length() 
@@ -177,15 +179,8 @@ def find_path(root, substring):
     return child, child.end
 
 
+# Recursively prints the suffix tree in a readable format.
 def print_tree(node, string, depth=0):
-    """
-    Recursively prints the suffix tree in a readable format.
-    Args:
-    - node: The current node to print.
-    - string: The original string used to build the suffix tree.
-    - depth: Current depth for indentation purposes.
-    """
-    
     # Base case: if node is None, return
     if not node:
         return
@@ -209,11 +204,8 @@ def print_tree(node, string, depth=0):
     # Recursively print children
     for child in node.children.values():
         print_tree(child, string, depth + 1)
+      
         
-def generate_random_text(length=1000):
-    """Generate a random string of lowercase alphabets of given length."""
-    return ''.join(random.choice(stringg.ascii_lowercase[:3]) for _ in range(length))
-
 # generate suffix array from suffix tree in linear time
 def generate_suffix_array(node):
     if node.is_leaf():
@@ -238,5 +230,12 @@ def generate_bwt(string):
     
 
 if __name__ == "__main__":
-    string = generate_random_text(100000)
-    generate_bwt(string)
+    string_filename = sys.argv[1]
+
+    with open(string_filename, "r") as file:
+        string = file.read().strip()
+
+
+    bwt = generate_bwt(string)
+    with open("output_genbwt.txt", "w") as output:
+        output.write(bwt)
