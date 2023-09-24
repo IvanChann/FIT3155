@@ -80,24 +80,28 @@ class Node:
 def ukkonens(string: str):
     n = len(string)
     last_j = 0
-    global_end = Pointer(0)
+    global_end = Pointer(0)  # custom pointer class
     
+    # initializing the root node and base case
     root = Node(-1, -1)
     root.children[string[0]] = Node(0, global_end, root, 0)
     root.suffix_link = root
     root.parent = root
     
-    active_node = root
+    active_node = root 
     pending_link = None 
     remainder = -1
     
 
     
     for i in range(n-1):
-        global_end += 1
+        global_end += 1 # Increment the global end pointer at each iteration
         
         for j in range(last_j + 1, i+2):
-             
+            
+            # Traversing fom the active node to find path node and path end
+            # path_end - index of the end of path along the edge
+            # path_node - node containg the edge
             if active_node is root:
                 path_node, path_end = find_path(root, string[j : i + 1])
             else:
@@ -106,6 +110,7 @@ def ukkonens(string: str):
             # rule 2 extensions (case 1)
             if path_node.end == path_end and string[i+1] not in path_node.children: 
                 
+                # Setting the active node to the parent of the path node
                 active_node = path_node.parent
                 remainder = path_end - path_node.start
                   
@@ -114,7 +119,7 @@ def ukkonens(string: str):
                     pending_link.suffix_link = path_node 
                     pending_link = None         
                                  
-                
+                # creating new leaf
                 new_child = Node(i+1, global_end, path_node, j)
                 path_node.add_child(string[i+1], new_child)
                 last_j += 1
@@ -142,6 +147,7 @@ def ukkonens(string: str):
                     pending_link.suffix_link = path_node 
                     pending_link = None
                     
+                # setting active node
                 if string[i+1] == string[path_end + 1]:
                     active_node = path_node.parent
                     remainder = path_end + 1 - path_node.start
@@ -225,6 +231,8 @@ def generate_bwt(string):
     suffix_array = generate_suffix_array(root)
     result = ""
     for i in suffix_array:
+        # Adding the character before the indexed character to the result.
+        # if i is 0 it wraps around to add the last character.
         result += string[i - 1]
     return result
     
