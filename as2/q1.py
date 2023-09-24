@@ -1,7 +1,7 @@
 import random
 import string as stringg
 
-# class to simulate pointing to an integer
+# class to emulate pointing to an integer
 class Pointer:
     def __init__(self, integer = None):
         self.integer = integer
@@ -10,7 +10,7 @@ class Pointer:
         return self.integer == other
     
     def __str__(self):
-        return "global: " + str(self.integer)
+        return str(self.integer)
     
     def __add__(self, other):
         return self.integer + other
@@ -92,20 +92,18 @@ def ukkonens(string: str):
     
     active_node = root
     pending_link = None 
-    remainder = 0
+    remainder = -1
     
 
     
     for i in range(n-1):
         global_end += 1
-        active_node = root
+        
         for j in range(last_j + 1, i+2):
-            active_node = active_node.suffix_link
-            
+             
             if active_node is root:
                 path_node, path_end = find_path(root, string[j : i + 1])
             else:
-                
                 path_node, path_end = find_path(active_node, string[i - remainder: i + 1])
                            
             # rule 2 extensions (case 1)
@@ -116,7 +114,7 @@ def ukkonens(string: str):
                   
                 # add suffix link if pending
                 if pending_link != None:
-                    pending_link.suffix_link = path_node
+                    pending_link.suffix_link = path_node 
                     pending_link = None         
                                  
                 
@@ -140,19 +138,22 @@ def ukkonens(string: str):
                 pending_link = split_node   
                 split_node.add_child(string[i+1], new_child)
                 last_j += 1
-
-
-
                 
             # rule 3
             elif (path_node.end == path_end and string[i+1] in path_node.children) or (string[i+1] == string[path_end + 1]):
                 if pending_link != None:
-                    pending_link.suffix_link = path_node
+                    pending_link.suffix_link = path_node 
                     pending_link = None
-                
-                remainder += 1
+                    
+                if string[i+1] == string[path_end + 1]:
+                    active_node = path_node.parent
+                    remainder = path_end + 1 - path_node.start
+                else:
+                    active_node = path_node
+                    remainder = 0                         
                 break
             
+            active_node = active_node.suffix_link
                 
     return root
 
@@ -213,12 +214,29 @@ def generate_random_text(length=1000):
     """Generate a random string of lowercase alphabets of given length."""
     return ''.join(random.choice(stringg.ascii_lowercase[:3]) for _ in range(length))
 
-def gen_bwt(str):
-    res = ""
-    suffix_tree = ukkonens(str + "$")
+# generate suffix array from suffix tree in linear time
+def generate_suffix_array(node):
+    if node.is_leaf():
+        return [node.suffix_index]
     
-    indexes = suffix_tree.dfs_traversal()
-    str = str + '$'
-    for index in indexes:
-        res += str[index - 1]
-    return res
+    result = []
+    for c in sorted(node.children.keys()): # sorting will take constant time assuming fixed alphabet size -> [36, 126] ASCII
+        result += generate_suffix_array(node.children[c])
+        
+    return result
+
+
+def generate_bwt(string):   
+    string += '$'
+    root = ukkonens(string)
+    
+    suffix_array = generate_suffix_array(root)
+    result = ""
+    for i in suffix_array:
+        result += string[i - 1]
+    return result
+    
+
+if __name__ == "__main__":
+    string = generate_random_text(100000)
+    generate_bwt(string)
